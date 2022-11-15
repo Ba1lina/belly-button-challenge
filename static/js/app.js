@@ -51,7 +51,12 @@ function updateCharts(sample) {
   var result = filterArray[0];
   var sample_values = result.sample_values;
   var otu_ids = result.otu_ids;
-  var otu_labels = result.otu_labels;   
+  var otu_labels = result.otu_labels;
+  var metadata = data.metadata;   
+  var filterArray2 = metadata.filter(sampleObject => sampleObject.id == sample);
+  var result2 = filterArray2[0];
+  var wash_freq = result2.wfreq;
+
   // Bubble Chart
   var trace1 = {
       x: otu_ids,
@@ -73,6 +78,7 @@ function updateCharts(sample) {
       margin: {t:30}
   };
   Plotly.newPlot('bubble', data, layout); 
+
   // Bar Chart
   var trace1 = {
       x: sample_values.slice(0,10).reverse(),
@@ -88,17 +94,52 @@ function updateCharts(sample) {
       margin: {l: 100, r: 100, t: 100, b: 100}
   };
   Plotly.newPlot("bar", data, layout);  
+
+    // Gauge
+    var data = [
+      {
+        type: "indicator",
+        mode: "gauge+number",
+        value: wash_freq,
+        title: { text: "Belly Button Washing Frequency", font: {size: 24 } },
+        gauge: {
+          axis: { range: [null, 9], tickwidth: 1, showticklabels: false, ticks: "" },
+          bgcolor: "white",
+          bar: { color: "darkblue", thickness:0 },
+          borderwidth: 0,
+          bordercolor: "gray",
+          steps: [
+            { range: [0, 1], color: 'rgba(248,243,236,255)' },
+            { range: [1, 2], color: 'rgba(244,241,228,255)' },
+            { range: [2, 3], color: 'rgba(233,231,201,255)' },
+            { range: [3, 4], color: 'rgba(229,232,176,255)' },
+            { range: [4, 5], color: 'rgba(213,229,153,255)' },
+            { range: [5, 6], color: 'rgba(183,205,143,255)' },
+            { range: [6, 7], color: 'rgba(139,192,134,255)' },
+            { range: [7, 8], color: 'rgba(137,188,141,255)' },
+            { range: [8, 9], color: 'rgba(132,181,137,255)' },
+          ]
+        }
+      }
+    ];
+    
+    var layout = {
+      width: 500,
+      height: 400,
+      margin: { t: 25, r: 25, l: 25, b: 25 },
+      paper_bgcolor: "white",
+    
+    };
+    
+    Plotly.newPlot('gauge', data, layout);
   });
 }
-
 
 function optionChanged(newSample) {
   // Fetch new data each time a new sample is selected
   updateCharts(newSample);
   updateMetadata(newSample);
 }
-
-
 
 // Initialize the dashboard
 init();
